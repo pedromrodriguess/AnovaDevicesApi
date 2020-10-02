@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DevicesApi</name>
+    </assembly>
+    <members>
+        <member name="M:DevicesApi.Controllers.DevicesController.GetAll">
+            <summary>
+            Returns all the devices in the system.
+            </summary>
+            <remarks>
+                **Route**: GET api/Devices
+                
+                **Example**:
+                
+                        api/Devices
+            </remarks>
+            <response code="200"> Returns all the devices in the system.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.DevicesController.GetById(System.Int32)">
+            <summary>
+            Returns the specified device.
+            </summary>
+            <remarks>
+                **Route**: GET api/Devices/id
+                
+                **Example**:
+                
+                        api/Devices/1
+            </remarks>
+            <response code="200"> Returns the device with specified id.</response>
+            <response code="404"> No device was found with the inserted id.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.DevicesController.Update(System.Int32,DevicesApi.Contracts.Requests.UpdateDeviceRequest)">
+            <summary>
+            Updates the specified device.
+            </summary>
+            <remarks>
+                **Route**: PUT: api/Devices/id 
+                
+                **Example**:
+                
+                        api/Devices/5
+                        {
+                            "name": "gas tank bp",
+                            "location": "porto"
+                        }
+            </remarks>
+            <response code="200"> The specified device was updated.</response>
+            <response code="404"> No device was found with the inserted id.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.DevicesController.Create(DevicesApi.Contracts.Requests.CreateDeviceRequest)">
+            <summary>
+            Creates a new device.
+            </summary>
+            <remarks>
+                **Route**: POST: api/Devices
+                
+                **Example**:
+                
+                        api/Devices
+                        {
+                            "name": "gas tank bp",
+                            "location": "porto"
+                        }
+            </remarks>
+            <response code="201"> The specified device was created.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.DevicesController.Delete(System.Int32)">
+            <summary>
+            Deletes the specified device.
+            </summary>
+            <remarks>
+                **Route**: DELETE: api/Devices/id
+                
+                **Example**:
+                
+                        api/Devices/5
+            </remarks>
+            <response code="404"> No device was found with the inserted id.</response>
+            <response code="200"> The specified device and all its readings were deleted.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.ReadingsController.GetAll">
+            <summary>
+            Returns all the readings in the system.
+            </summary>
+            <remarks>
+                **Route**: GET api/Readings
+                
+                **Example**:
+                
+                        api/Readings
+            </remarks>
+            <response code="200"> Returns all the readings in the system.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.ReadingsController.GetReadingsUsingDeviceId(System.Int32)">
+            <summary>
+            Returns all the readings from the specified device.
+            </summary>
+            <remarks>
+                **Route**: GET: api/Readings/5
+                
+                **Example**:
+                
+                        api/Readings/5
+            </remarks>
+            <response code="200"> Returns all the readings from the specified device.</response>
+            <response code="404"> No device was found with the inserted id.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.ReadingsController.GetReadingsUsingDeviceId_Startingdate(System.Int32,System.Int64)">
+            <summary>
+            Returns all the readings registered since the given starting datetime from the specified device.
+            </summary>
+            <remarks>
+                **Route**: GET: api/Readings/id/startingDate
+                
+                **Example**:
+                
+                        api/Readings/5/1601456548
+            </remarks>
+            <response code="200"> Returns all the readings, registered since the given starting datetime, from the specified device.</response>
+            <response code="404"> No device was found with the inserted id.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.ReadingsController.GetReadingsUsingDeviceId_Startingdate_Endingdate(System.Int32,System.Int64,System.Int64)">
+            <summary>
+            Returns all the readings, registered since the given starting datetime up until the provided ending datetime, from the specified device.
+            </summary>
+            <remarks>
+                **Route**: GET: api/Readings/id/startingDate/endingDate
+                
+                **Example**:
+                
+                        api/Readings/5/1601456548/1601456606
+            </remarks>
+            <response code="200"> Returns all the readings registered since the given starting datetime from the specified device.</response>
+            <response code="400"> The specified startingDate is more recent than the endingDate provided.</response>
+            <response code="404"> No device was found with the inserted id.</response>
+        </member>
+        <member name="M:DevicesApi.Controllers.ReadingsController.Create(DevicesApi.Domain.Reading)">
+            <summary>
+            Creates a new reading.
+            </summary>
+            <remarks>
+                **Route**: POST: api/Readings
+                
+                **Example**:
+                
+                        api/Readings
+                        {
+                            "timestamp": 1601456548,
+                            "reading_type": "battery",
+                            "raw_value": 80,
+                            "device_id": 1
+                        }
+            </remarks>
+            <response code="201"> The specified reading was created.</response>
+            <response code="400"> There is already a reading with the specified timestamp and device id combination.</response>
+        </member>
+    </members>
+</doc>
