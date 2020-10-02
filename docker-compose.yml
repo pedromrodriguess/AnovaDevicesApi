@@ -1,0 +1,27 @@
+version: "3"
+
+networks:
+    localdev:
+        name: localdev
+services:
+    api:
+        build: DevicesApi/
+        restart: always
+        ports:
+            - "8000:80"
+        depends_on:
+            - db
+        networks:
+            - localdev
+
+    db:
+        image: "microsoft/mssql-server-linux"
+        container_name: db
+        environment: 
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=Pedro*12345
+            - MSSQL_TCP_PORT=1433
+        ports:
+            - "1400:1433"
+        networks:
+            - localdev
