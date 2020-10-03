@@ -51,13 +51,13 @@ namespace DevicesApi.Controllers
         /// <response code="200"> Returns all the readings from the specified device.</response>
         /// <response code="404"> No device was found with the inserted id.</response>
         [HttpGet("{device_id}")]
-        public async Task<ActionResult<Reading>> GetReadingsUsingDeviceId(int device_id)
+        public async Task<ActionResult<IEnumerable<Reading>>> GetReadingsUsingDeviceId(int device_id)
         {
             var device = await _context.Devices.FindAsync(device_id);
             if (device == null)
                 return NotFound($"The specified device_id {device_id} does not exist!");
 
-            var readings = _context.Readings.Where(reading => reading.Device_id == device_id);
+            var readings = await _context.Readings.Where(reading => reading.Device_id == device_id).ToListAsync();
             return Ok(readings);
         }
 
@@ -74,13 +74,13 @@ namespace DevicesApi.Controllers
         /// <response code="200"> Returns all the readings, registered since the given starting datetime, from the specified device.</response>
         /// <response code="404"> No device was found with the inserted id.</response>
         [HttpGet("{device_id}/{startingDate}")]
-        public async Task<ActionResult<Reading>> GetReadingsUsingDeviceId_Startingdate(int device_id, long startingDate)
+        public async Task<ActionResult<IEnumerable<Reading>>> GetReadingsUsingDeviceId_Startingdate(int device_id, long startingDate)
         {
             var device = await _context.Devices.FindAsync(device_id);
             if (device == null)
                 return NotFound($"The specified device_id {device_id} does not exist!");
 
-            var readings = _context.Readings.Where(reading => reading.Device_id == device_id && reading.Timestamp >= startingDate);
+            var readings = await _context.Readings.Where(reading => reading.Device_id == device_id && reading.Timestamp >= startingDate).ToListAsync();
             return Ok(readings);
         }
 
@@ -99,7 +99,7 @@ namespace DevicesApi.Controllers
         /// <response code="400"> The specified startingDate is more recent than the endingDate provided.</response>
         /// <response code="404"> No device was found with the inserted id.</response>
         [HttpGet("{device_id}/{startingDate}/{endingDate}")]
-        public async Task<ActionResult<Reading>> GetReadingsUsingDeviceId_Startingdate_Endingdate(int device_id, long startingDate, long endingDate)
+        public async Task<ActionResult<IEnumerable<Reading>>> GetReadingsUsingDeviceId_Startingdate_Endingdate(int device_id, long startingDate, long endingDate)
         {
             var device = await _context.Devices.FindAsync(device_id);
             if (device == null)
@@ -108,7 +108,7 @@ namespace DevicesApi.Controllers
             if (startingDate > endingDate)
                 return BadRequest("The specified startingDate is more recent than the endingDate provided!");
 
-            var readings = _context.Readings.Where(reading => reading.Device_id == device_id && reading.Timestamp >= startingDate && reading.Timestamp <= endingDate);
+            var readings = await _context.Readings.Where(reading => reading.Device_id == device_id && reading.Timestamp >= startingDate && reading.Timestamp <= endingDate).ToListAsync();
             return Ok(readings);
         }
 
@@ -130,6 +130,7 @@ namespace DevicesApi.Controllers
         /// </remarks>
         /// <response code="201"> The specified reading was created.</response>
         /// <response code="400"> There is already a reading with the specified timestamp and device id combination.</response>
+        /// <response code="404"> No device was found with the inserted id.</response>
         [HttpPost]
         public async Task<ActionResult<Reading>> Create(Reading reading)
         {
