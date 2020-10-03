@@ -36,14 +36,14 @@ The following section provides a high level description of the API.
 | ---- | ---------------- | ------ | --------------------------------------------  |  ------------- |
 | 1    | /api/Readings/   | GET    | Returns all the readings in the system.	   |  200           |	
 | 2    | /api/Readings/id | GET    | Returns all the readings from the specified   |  200, 404	    |
-|	   |				  |        | device.									   |				|
+	   				                 device.									   				
 | 3    | /api/Devices/id  | GET    | Returns all the readings registered since     |  200, 404	    |
-|	   | /startingDate    |        | the given starting datetime from the 		   |				|
-|	   |				  |		   | specified device.							   |				|
+	     /startingDate               the given starting datetime from the 		   				
+									 specified device.							   				
 | 4    | /api/Devices/id  | GET    | Returns all the readings registered since     |  200, 404	    |
-|	   | /startingDate    |        | the given starting datetime up until the 	   |				|
-|	   | /endingDate	  |		   | provided ending datetime, from the specified  |				|
-|	   |				  |		   | device.									   |				|
+	     /startingDate               the given starting datetime up until the 	   				
+	     /endingDate	  		     provided ending datetime, from the specified  				
+	   				  		         device.									   				
 
 
 ## Return codes
