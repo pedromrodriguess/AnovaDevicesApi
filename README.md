@@ -37,14 +37,14 @@ The following section provides a high level description of the API.
 | 1    | /api/Readings/   | GET    | Returns all the readings in the system.	   |  200           |	
 | 2    | /api/Readings/id | GET    | Returns all the readings from the specified   |  200, 404	    |
 |	   |				  |        | device.									   |				|
-| 3    | /api/Devices/id  | GET    | Returns all the readings registered since     |  200, 404	    |
+| 3    | /api/Readings/id | GET    | Returns all the readings registered since     |  200, 404	    |
 |	   | /startingDate    |        | the given starting datetime from the 		   |				|
 |	   |				  |		   | specified device.							   |				|
-| 4    | /api/Devices/id  | GET    | Returns all the readings registered since     |  200, 404	    |
+| 4    | /api/Readings/id | GET    | Returns all the readings registered since     |  200, 404	    |
 |	   | /startingDate    |        | the given starting datetime up until the 	   |				|
 |	   | /endingDate	  |		   | provided ending datetime, from the specified  |				|
 |	   |				  |		   | device.									   |				|
-
+| 5    | /api/Readings	  | POST   | Creates a new reading 						   |  201, 400, 404 |
 
 ## Return codes
 
@@ -58,3 +58,12 @@ The following table lists all the used HTTP status codes by the application:
 | 404  | Not Found           |
 | 409  | Conflict            |
 | 500  | Server Error        |
+
+
+## Testing
+
+### Unit Testing
+
+The project "DevicesApi.UnitTests" contains unit tests for the main valid and invalid invocations of both
+the Devices and Readings controllers. It uses a memory database to allow the execution of the tests without
+any database dependencies.
