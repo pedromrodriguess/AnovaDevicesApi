@@ -1,9 +1,21 @@
-version: "3"
+version: "3.4"
 
 networks:
     localdev:
         name: localdev
 services:
+    integration:
+        build: 
+            context: ./
+            dockerfile: ./DevicesApi.IntegrationTests/Dockerfile.integration
+        depends_on:
+            - db
+            - api
+        links:
+             - api
+        networks:
+            - localdev
+            
     api:
         build: DevicesApi/
         restart: always
@@ -13,7 +25,7 @@ services:
             - db
         networks:
             - localdev
-
+                
     db:
         image: "microsoft/mssql-server-linux"
         container_name: db

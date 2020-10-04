@@ -1,0 +1,9 @@
+FROM mcr.microsoft.com/dotnet/core/sdk as build
+WORKDIR /tests
+
+Copy . ./
+RUN dotnet publish -c Release -o out
+
+EXPOSE 80
+
+ENTRYPOINT ["./wait-for-it.sh", "api:80", "--strict", "--timeout=300", "--", "dotnet", "test", "DevicesApi.IntegrationTests/bin/Release/netcoreapp3.1/DevicesApi.IntegrationTests.dll", "--logger", "trx"]

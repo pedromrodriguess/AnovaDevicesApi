@@ -1,6 +1,7 @@
 using DevicesApi.Contracts.Requests;
 using DevicesApi.Controllers;
 using DevicesApi.Domain;
+using DevicesApi.TestsAuxiliaryTools;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -13,7 +14,7 @@ using Xunit;
 
 namespace DevicesApi.UnitTests
 {
-    public class DevicesControllerTests
+    public class DevicesControllerUnitTests
     {
         [Fact]
         public async Task GetAll_WithDevicesAvailable_ReturnsDevices()
@@ -85,10 +86,10 @@ namespace DevicesApi.UnitTests
         }
 
         [Fact]
-        public void Update_ValidParameters_DeviceIsUpdated()
+        public void Update_WithValidParameters_DeviceIsUpdated()
         {
             //Arrange
-            var dbContext = DbContextMocker.GetDbContext(nameof(Update_ValidParameters_DeviceIsUpdated));
+            var dbContext = DbContextMocker.GetDbContext(nameof(Update_WithValidParameters_DeviceIsUpdated));
             var devicesController = new DevicesController(dbContext);
             var updateDeviceRequest = new UpdateDeviceRequest
             {
@@ -140,10 +141,10 @@ namespace DevicesApi.UnitTests
         }
 
         [Fact]
-        public async Task Create_ValidParameters_DeviceIsAdded()
+        public async Task Create_WithValidParameters_DeviceIsAdded()
         {
             //Arrange
-            var dbContext = DbContextMocker.GetDbContext(nameof(Create_ValidParameters_DeviceIsAdded));
+            var dbContext = DbContextMocker.GetDbContext(nameof(Create_WithValidParameters_DeviceIsAdded));
             var devicesController = new DevicesController(dbContext);
             var createDeviceRequest = new CreateDeviceRequest
             {
@@ -171,10 +172,10 @@ namespace DevicesApi.UnitTests
         }
 
         [Fact]
-        public async Task Delete_ValidParameters_DeviceIsDeleted()
+        public async Task Delete_WithValidParameters_DeviceIsDeleted()
         {
             //Arrange
-            var dbContext = DbContextMocker.GetDbContext(nameof(Delete_ValidParameters_DeviceIsDeleted));
+            var dbContext = DbContextMocker.GetDbContext(nameof(Delete_WithValidParameters_DeviceIsDeleted));
             var devicesController = new DevicesController(dbContext);
 
             //Act

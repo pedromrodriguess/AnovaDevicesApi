@@ -1,5 +1,6 @@
 ﻿using DevicesApi.Controllers;
 using DevicesApi.Domain;
+using DevicesApi.TestsAuxiliaryTools;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,7 +12,7 @@ using Xunit;
 
 namespace DevicesApi.UnitTests
 {
-    public class ReadingsControllerTests
+    public class ReadingsControllerUnitTests
     {
         [Fact]
         public async Task GetAll_WithReadingsAvailable_ReturnsReadings()

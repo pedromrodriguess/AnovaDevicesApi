@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DevicesApi.UnitTests
+namespace DevicesApi.TestsAuxiliaryTools
 {
-    class ReadingsComparer
+    public static class ReadingsComparer
     {
         public static bool CompareReadingsLists(List<Reading> readingsList1, List<Reading> readingsList2)
         {
