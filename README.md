@@ -69,10 +69,10 @@ for all the api endpoints. It uses a in-memory database to better isolate the me
 
 ### Integration Testing
 
-All the integration tests will be ran automatically when the system is started up with the command:
+In order to run all the integration tests, execute the following command:
 
 ```
-docker-compose up --build
+docker-compose -f docker-compose.integration up --build
 ```
 The tests will populate the database, perform the tests and proceed to the database clean up.
 

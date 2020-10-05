@@ -4,7 +4,18 @@ networks:
     localdev:
         name: localdev
 services:
-           
+    integration:
+        build: 
+            context: ./
+            dockerfile: ./DevicesApi.IntegrationTests/Dockerfile.integration
+        depends_on:
+            - db
+            - api
+        links:
+             - api
+        networks:
+            - localdev
+            
     api:
         build: DevicesApi/
         restart: always

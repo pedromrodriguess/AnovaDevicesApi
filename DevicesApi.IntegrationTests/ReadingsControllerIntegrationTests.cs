@@ -1,4 +1,5 @@
-﻿using DevicesApi.Domain;
+﻿using DevicesApi.Contracts.Requests;
+using DevicesApi.Domain;
 using DevicesApi.TestsAuxiliaryTools;
 using FluentAssertions;
 using Newtonsoft.Json;
@@ -19,85 +20,97 @@ namespace DevicesApi.IntegrationTests
         public async Task GetAll_WithReadingsAvailable_ReturnsReadings()
         {
             //Arrange
-            var inserDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetAllName1', 'integrationTestGetAllLocation1')" +
-                ", ('integrationTestGetAllName2', 'integrationTestGetAllLocation2')";
+            CreateDeviceRequest deviceRequest1 = new CreateDeviceRequest { Name = "testGetAllName1", Location = "testGetAllLocation1" };
+            CreateDeviceRequest deviceRequest2 = new CreateDeviceRequest { Name = "testGetAllName2", Location = "testGetAllLocation2" };
+
+            var inserDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest1.Name}', '{deviceRequest1.Location}')" +
+                $", ('{deviceRequest2.Name}', '{deviceRequest2.Location}')";
             ExecuteNonQuery(inserDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetAllName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest1.Name}'";
             var device1 = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device1);
 
-            var selectSqlStringDevice2 = "Select * from Devices WHERE Name = 'integrationTestGetAllName2'";
+            var selectSqlStringDevice2 = $"Select * from Devices WHERE Name = '{deviceRequest2.Name}'";
             var device2 = ExecuteDevicesQuery(selectSqlStringDevice2);
             Assert.NotNull(device2);
 
+            Reading expectedReading1 = new Reading { Device_id = device1.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
+            Reading expectedReading2 = new Reading { Device_id = device2.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
+
             string insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
-                $" values({device1.Device_id}, 1000, 'typeTest1', 10), ({device2.Device_id}, 1001, 'typeTest2', 20)";
+                $" values({device1.Device_id}, {expectedReading1.Timestamp}, '{expectedReading1.Reading_type}', {expectedReading1.Raw_value})," +
+                $" ({device2.Device_id}, {expectedReading2.Timestamp}, '{expectedReading2.Reading_type}', {expectedReading2.Raw_value})";
+
             ExecuteNonQuery(insertReadingsSqlString);
 
-            Reading reading1 = new Reading { Device_id = device1.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
-            Reading reading2 = new Reading { Device_id = device2.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
-
-            string getAllUri = $"http://api:80/api/Readings";
-
+            string requestUri = "Readings";
             // Act
-            var response = await HttpClient.GetAsync(getAllUri);
-            var readingList = await response.Content.ReadAsAsync<List<Reading>>();
+            var response = await HttpClient.GetAsync(requestUri);
+            var receivedReadingList = await response.Content.ReadAsAsync<List<Reading>>();
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading1));
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading2));
+
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, expectedReading1), "The reading list received " +
+                "does not contain the expected reading");
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, expectedReading2), "The reading list received " +
+                "does not contain the expected reading");
 
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id in ({device1.Device_id}, {device2.Device_id})";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id in ({device1.Device_id}, {device2.Device_id})";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpDevices, "It was not possible to clean up the created devices database.");
         }
 
         [Fact]
         public async Task GetReadingsUsingDeviceId_WithReadingsAvailable_ReturnsReadings()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testGetByIdName1", Location = "testGetByIdLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
-            Console.WriteLine("GetByDeviceId: Device introduzido: Id:" + device.Device_id);
+
+            Reading expectedReading1 = new Reading { Device_id = device.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
+            Reading expectedReading2 = new Reading { Device_id = device.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
 
             var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
-                $" values({device.Device_id}, 1000, 'typeTest1', 10), ({device.Device_id}, 1001, 'typeTest2', 20)";
+                $" values({device.Device_id}, {expectedReading1.Timestamp}, '{expectedReading1.Reading_type}', {expectedReading1.Raw_value})," +
+                $" ({device.Device_id}, {expectedReading2.Timestamp}, '{expectedReading2.Reading_type}', {expectedReading2.Raw_value})";
+
             ExecuteNonQuery(insertReadingsSqlString);
 
-            Reading reading1 = new Reading { Device_id = device.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
-            Reading reading2 = new Reading { Device_id = device.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
-
-            string getAllUri = $"http://api:80/api/Readings/{device.Device_id}";
+            string requestUri = $"Readings/{device.Device_id}";
 
             // Act
-            var response = await HttpClient.GetAsync(getAllUri);
-            var readingList = await response.Content.ReadAsAsync<List<Reading>>();
+            var response = await HttpClient.GetAsync(requestUri);
+            var receivedReadingList = await response.Content.ReadAsAsync<List<Reading>>();
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading1));
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading2));
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, expectedReading1), "The reading list received " +
+                "does not contain the expected reading");
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, expectedReading2), "The reading list received " +
+                "does not contain the expected reading");
 
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpDevices, "It was not possible to clean up the created devices database.");
         }
 
         [Fact]
@@ -105,10 +118,10 @@ namespace DevicesApi.IntegrationTests
         {
             //Arrange
             int nonExistingDeviceId = 99;
-            string getById = $"http://api:80/api/Responses/{nonExistingDeviceId}";
+            string requestUri = $"Responses/{nonExistingDeviceId}";
 
             // Act
-            var response = await HttpClient.GetAsync(getById);
+            var response = await HttpClient.GetAsync(requestUri);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -118,43 +131,49 @@ namespace DevicesApi.IntegrationTests
         public async Task GetReadingsUsingDeviceId_Startingdate_WithReadingsAvailable_ReturnsReadings()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testGetStartingDateName1", Location = "testGetStartingDateLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
-            Console.WriteLine("GetByDeviceId: Device introduzido: Id:" + device.Device_id);
-
-            var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
-                $" values({device.Device_id}, 1000, 'typeTest1', 10), ({device.Device_id}, 1001, 'typeTest2', 20)";
-            ExecuteNonQuery(insertReadingsSqlString);
 
             Reading reading1 = new Reading { Device_id = device.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
             Reading reading2 = new Reading { Device_id = device.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
 
+            var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
+                $" values({device.Device_id}, {reading1.Timestamp}, '{reading1.Reading_type}', {reading1.Raw_value})," +
+                $" ({device.Device_id}, {reading2.Timestamp}, '{reading2.Reading_type}', {reading2.Raw_value})";
+
+            ExecuteNonQuery(insertReadingsSqlString);
+
             var startingDatetime = 1000;
 
-            string getAllUri = $"http://api:80/api/Readings/{device.Device_id}/{startingDatetime}";
+            string requestUri = $"Readings/{device.Device_id}/{startingDatetime}";
 
             // Act
-            var response = await HttpClient.GetAsync(getAllUri);
-            var readingList = await response.Content.ReadAsAsync<List<Reading>>();
+            var response = await HttpClient.GetAsync(requestUri);
+            var receivedReadingList = await response.Content.ReadAsAsync<List<Reading>>();
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading1));
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading2));
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, reading1), "The reading list received " +
+                "does not contain the expected reading");
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, reading2), "The reading list received " +
+                "does not contain the expected reading");
 
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
+
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpDevices, "It was not possible to clean up the created devices database.");
         }
 
         [Fact]
@@ -164,10 +183,10 @@ namespace DevicesApi.IntegrationTests
             int nonExistingDeviceId = 99;
             var startingDatetime = 1000;
 
-            string getById = $"http://api:80/api/Responses/{nonExistingDeviceId}/{startingDatetime}";
+            string requestUri = $"Readings/{nonExistingDeviceId}/{startingDatetime}";
 
             // Act
-            var response = await HttpClient.GetAsync(getById);
+            var response = await HttpClient.GetAsync(requestUri);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -177,42 +196,47 @@ namespace DevicesApi.IntegrationTests
         public async Task GetReadingsUsingDeviceId_Startingdate_Endingdate_WithReadingsAvailable_ReturnsReadings()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testStartingEndDateName1", Location = "testStartingEndDateLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
-
-            var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
-                $" values({device.Device_id}, 1000, 'typeTest1', 10), ({device.Device_id}, 1001, 'typeTest2', 20)";
-            ExecuteNonQuery(insertReadingsSqlString);
 
             Reading reading1 = new Reading { Device_id = device.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
             Reading reading2 = new Reading { Device_id = device.Device_id, Timestamp = 1001, Reading_type = "typeTest2", Raw_value = 20 };
 
+            var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
+                $" values({device.Device_id}, {reading1.Timestamp}, '{reading1.Reading_type}', {reading1.Raw_value})," +
+                $" ({device.Device_id}, {reading2.Timestamp}, '{reading2.Reading_type}', {reading2.Raw_value})";
+
+            ExecuteNonQuery(insertReadingsSqlString);
+
             var startingDatetime = 1001;
             var endingDatetime = 1001;
 
-            string getAllUri = $"http://api:80/api/Readings/{device.Device_id}/{startingDatetime}/{endingDatetime}";
+            string requestUri = $"Readings/{device.Device_id}/{startingDatetime}/{endingDatetime}";
 
             // Act
-            var response = await HttpClient.GetAsync(getAllUri);
-            var readingList = await response.Content.ReadAsAsync<List<Reading>>();
+            var response = await HttpClient.GetAsync(requestUri);
+            var receivedReadingList = await response.Content.ReadAsAsync<List<Reading>>();
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(readingList, reading2));
+            Assert.True(ReadingsComparer.DoesReadingsListContainSpecificReading(receivedReadingList, reading2), "The reading list received " +
+                "does not contain the expected reading");
 
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpDevices, "It was not possible to clean up the created devices database.");
         }
 
         [Fact]
@@ -223,10 +247,10 @@ namespace DevicesApi.IntegrationTests
             var startingDatetime = 1000;
             var endingDatetime = 1001;
 
-            string getById = $"http://api:80/api/Responses/{nonExistingDeviceId}/{startingDatetime}/{endingDatetime}";
+            string requestUri = $"Readings/{nonExistingDeviceId}/{startingDatetime}/{endingDatetime}";
 
             // Act
-            var response = await HttpClient.GetAsync(getById);
+            var response = await HttpClient.GetAsync(requestUri);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -236,20 +260,22 @@ namespace DevicesApi.IntegrationTests
         public async Task GetReadingsUsingDeviceId_Startingdate_Endingdate_StartingDateHigherThanEnding_ReturnsBadRequest()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testInvalidStartingEndName1", Location = "testInvalidStartingEndLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
 
             var startingDatetime = 1005;
             var endingDatetime = 1000;
 
-            string getAllUri = $"http://api:80/api/Readings/{device.Device_id}/{startingDatetime}/{endingDatetime}";
+            string requestUri = $"Readings/{device.Device_id}/{startingDatetime}/{endingDatetime}";
 
             // Act
-            var response = await HttpClient.GetAsync(getAllUri);
+            var response = await HttpClient.GetAsync(requestUri);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -257,17 +283,19 @@ namespace DevicesApi.IntegrationTests
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
         }
 
         [Fact]
         public async Task Create_ValidParameters_ReadingIsAdded()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testCreateName1", Location = "testCreateLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
 
@@ -275,10 +303,10 @@ namespace DevicesApi.IntegrationTests
             var postPayload = JsonConvert.SerializeObject(reading);
             HttpContent postContent = new StringContent(postPayload, Encoding.UTF8, "application/json");
 
-            string getAllUri = $"http://api:80/api/Readings/";
+            string requestUri = $"Readings/";
 
             // Act
-            var response = await HttpClient.PostAsync(getAllUri, postContent);
+            var response = await HttpClient.PostAsync(requestUri, postContent);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -286,11 +314,11 @@ namespace DevicesApi.IntegrationTests
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpDevices, "It was not possible to clean up the created devices database.");
         }
 
         [Fact]
@@ -302,10 +330,10 @@ namespace DevicesApi.IntegrationTests
             var postPayload = JsonConvert.SerializeObject(reading);
             HttpContent postContent = new StringContent(postPayload, Encoding.UTF8, "application/json");
 
-            string getAllUri = $"http://api:80/api/Readings/";
+            string requestUri = $"Readings/";
 
             // Act
-            var response = await HttpClient.PostAsync(getAllUri, postContent);
+            var response = await HttpClient.PostAsync(requestUri, postContent);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -315,26 +343,29 @@ namespace DevicesApi.IntegrationTests
         public async Task Create_AlreadyExistingDatetimeForTheDevice_ReturnsBadRequest()
         {
             //Arrange
-            var insertDeviceSqlString = "Insert into Devices (Name, Location) values('integrationTestGetByIdName1', 'integrationTestGetByIdLocation1')";
+            CreateDeviceRequest deviceRequest = new CreateDeviceRequest { Name = "testBadRequestCreateName1", Location = "testBadRequestCreateLocation1" };
+
+            var insertDeviceSqlString = $"Insert into Devices (Name, Location) values('{deviceRequest.Name}', '{deviceRequest.Location}')";
             ExecuteNonQuery(insertDeviceSqlString);
 
-            var selectSqlStringDevice1 = "Select * from Devices WHERE Name = 'integrationTestGetByIdName1'";
+            var selectSqlStringDevice1 = $"Select * from Devices WHERE Name = '{deviceRequest.Name}'";
             var device = ExecuteDevicesQuery(selectSqlStringDevice1);
             Assert.NotNull(device);
-            Console.WriteLine("GetByDeviceId: Device introduzido: Id:" + device.Device_id);
-
-            var insertReadingsSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
-                $" values({device.Device_id}, 1000, 'typeTest1', 10), ({device.Device_id}, 1001, 'typeTest2', 20)";
-            ExecuteNonQuery(insertReadingsSqlString);
 
             Reading reading = new Reading { Device_id = device.Device_id, Timestamp = 1000, Reading_type = "typeTest1", Raw_value = 10 };
+
+            var insertReadingSqlString = "Insert into Readings (Device_id, Timestamp, Reading_type, Raw_value)" +
+                $" values({device.Device_id}, {reading.Timestamp}, '{reading.Reading_type}', {reading.Raw_value})";
+
+            ExecuteNonQuery(insertReadingSqlString);
+
             var postPayload = JsonConvert.SerializeObject(reading);
             HttpContent postContent = new StringContent(postPayload, Encoding.UTF8, "application/json");
 
-            string getAllUri = $"http://api:80/api/Readings/";
+            string requestUri = $"Readings/";
 
             // Act
-            var response = await HttpClient.PostAsync(getAllUri, postContent);
+            var response = await HttpClient.PostAsync(requestUri, postContent);
 
             //Assert 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -342,11 +373,10 @@ namespace DevicesApi.IntegrationTests
             //Clean Up
             var cleanUpReadingsSqlString = $"DELETE From Readings WHERE Device_id = {device.Device_id}";
             var cleanedUpReadings = ExecuteNonQuery(cleanUpReadingsSqlString);
-            Assert.True(cleanedUpReadings);
 
             var cleanUpDevicesSqlString = $"DELETE From Devices WHERE Device_id = {device.Device_id}";
             var cleanedUpDevices = ExecuteNonQuery(cleanUpDevicesSqlString);
-            Assert.True(cleanedUpDevices);
+            Assert.True(cleanedUpReadings, "It was not possible to clean up the created readings database.");
         }
     }
 }

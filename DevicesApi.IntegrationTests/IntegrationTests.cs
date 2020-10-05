@@ -15,7 +15,10 @@ namespace DevicesApi.IntegrationTests
 
         protected IntegrationTests()
         {
-            HttpClient = new HttpClient();
+            HttpClient = new HttpClient
+            {
+                BaseAddress = new System.Uri("http://api:80/api/")
+            };
             ConnectionString = "Server=db;Database=DevicesApi;User=sa;Password=Pedro*12345";
             Connection = new SqlConnection(ConnectionString);
             DataAdapter = new SqlDataAdapter();
