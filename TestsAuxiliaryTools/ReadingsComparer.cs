@@ -24,6 +24,14 @@ namespace DevicesApi.TestsAuxiliaryTools
             return true;
         }
 
+        public static bool DoesReadingsListContainSpecificReading(List<Reading> readingList, Reading expectedReading)
+        {
+            if (readingList == null)
+                return false;
+
+            return readingList.Any(reading => CompareReadings(reading, expectedReading));
+        }
+
         public static bool CompareReadings(Reading reading1, Reading reading2)
         {
             if ((reading1.Device_id != reading2.Device_id
@@ -35,5 +43,6 @@ namespace DevicesApi.TestsAuxiliaryTools
             }
             return true;
         }
+        
     }
 }
