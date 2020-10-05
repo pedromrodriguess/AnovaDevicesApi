@@ -64,6 +64,30 @@ The following table lists all the used HTTP status codes by the application:
 
 ### Unit Testing
 
-The project "DevicesApi.UnitTests" contains unit tests for the main valid and invalid invocations of both
-the Devices and Readings controllers. It uses a memory database to allow the execution of the tests without
-any database dependencies.
+The folder "DevicesApi.UnitTests" contains unit tests that validates the controllers methods responsible
+for all the api endpoints. It uses a in-memory database to better isolate the methods' logic testing.
+
+### Integration Testing
+
+All the integration tests will be ran automatically when the system is started up with the command:
+
+```
+docker-compose up --build
+```
+The tests will populate the database, perform the tests and proceed to the database clean up.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
