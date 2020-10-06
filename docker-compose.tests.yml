@@ -4,10 +4,10 @@ networks:
     localdev:
         name: localdev
 services:
-    integration:
+    integrationtests:
         build: 
             context: ./
-            dockerfile: ./DevicesApi.IntegrationTests/Dockerfile.integration
+            dockerfile: ./DevicesApi.IntegrationTests/Dockerfile.tests.integration
         depends_on:
             - db
             - api
@@ -15,6 +15,11 @@ services:
              - api
         networks:
             - localdev
+            
+    unittesting:
+        build: 
+            context: ./
+            dockerfile: ./DevicesApi.UnitTests/Dockerfile.tests.unit
             
     api:
         build: DevicesApi/

@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/core/sdk as build
+WORKDIR /tests
+
+Copy . ./
+RUN dotnet publish -c Release -o out
+
+ENTRYPOINT ["dotnet", "test", "DevicesApi.UnitTests/bin/Release/netcoreapp3.1/DevicesApi.UnitTests.dll", "--logger", "trx"]

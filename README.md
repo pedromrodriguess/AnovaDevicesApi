@@ -44,7 +44,7 @@ The following section provides a high level description of the API.
 |	   | /startingDate    |        | the given starting datetime up until the 	   |				|
 |	   | /endingDate	  |		   | provided ending datetime, from the specified  |				|
 |	   |				  |		   | device.									   |				|
-| 5    | /api/Readings	  | POST   | Creates a new reading 						   |  201, 400, 404 |
+| 5    | /api/Readings	  | POST   | Creates a new reading.						   |  201, 400, 404 |
 
 ## Return codes
 
@@ -62,19 +62,19 @@ The following table lists all the used HTTP status codes by the application:
 
 ## Testing
 
-### Unit Testing
+### Tests Information
 
-The folder "DevicesApi.UnitTests" contains unit tests that validates the controllers methods responsible
-for all the api endpoints. It uses a in-memory database to better isolate the methods' logic testing.
+The api contains unit and integration tests that validate the api endpoints
 
-### Integration Testing
+The unit tests use a in-memory database to better isolate the methods' logic testing.
+The integration test populate the containerized database, perform the tests and clean up all the created data.
 
-In order to run all the integration tests, execute the following command:
+### Run the tests
 
 ```
-docker-compose -f docker-compose.integration up --build
+docker-compose -f docker-compose.tests up --build
 ```
-The tests will populate the database, perform the tests and proceed to the database clean up.
+
 
 
 
