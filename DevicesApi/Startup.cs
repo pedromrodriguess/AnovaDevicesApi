@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using DevicesApi.Options;
 using Microsoft.OpenApi.Models;
 using DevicesApi.Installers;
+using Microsoft.AspNetCore.Http;
 
 namespace DevicesApi
 {
@@ -63,7 +64,11 @@ namespace DevicesApi
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "api/{controller=Home}/{action=Index}");
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("The api is up and running! Access http://localhost:8000/swagger/index.html to interact with it!");
+                });
             });
         }
         private static void UpdateDatabase(IApplicationBuilder app)
