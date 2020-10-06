@@ -67,10 +67,15 @@ The following table lists all the used HTTP status codes by the application:
 The api contains unit and integration tests that validate the api endpoints
 
 The unit tests use a in-memory database to better isolate the methods' logic testing.
+
 The integration test populate the containerized database, perform the tests and clean up all the created data.
+
 As recommended in the Docker documentation (https://docs.docker.com/compose/startup-order/), the integration tests
 use the "wait-for-it" script to guarantee that the api and db services are fully operational before running.
-
+If you are using a linux or macOS, you have to give the "wait-for-it" file permission for execution.
+...
+chmod +x "wait-for-it.sh"
+...
 ### Run the tests
 
 ```
