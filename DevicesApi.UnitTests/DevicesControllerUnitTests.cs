@@ -4,10 +4,7 @@ using DevicesApi.Domain;
 using DevicesApi.TestsAuxiliaryTools;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,14 +29,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.GetAll();
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var devicesReceived = values.As<List<Device>>();
+            var devicesReceived = result.Value.As<List<Device>>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(DevicesComparer.CompareDevicesLists(devicesReceived, expectedDevices));
+            Assert.True(DevicesComparer.CompareDevicesLists(devicesReceived, expectedDevices), "Devices list did not contain the " +
+                "expected device.");
         }
 
         [Fact]
@@ -56,14 +53,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.GetById(1);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice));
+            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice), "The device received is different " +
+                "than the expected.");
         }
 
         [Fact]
@@ -76,8 +73,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.GetById(4);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
@@ -106,14 +102,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = devicesController.Update(1, updateDeviceRequest);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice));
+            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice), "The device received is different " +
+            "than the expected.");
         }
 
         [Fact]
@@ -131,8 +127,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = devicesController.Update(4, updateDeviceRequest);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
@@ -161,14 +156,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.Create(createDeviceRequest);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.Created);
-            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice));
+            Assert.True(DevicesComparer.CompareDevices(deviceReceived, expectedDevice), "The device received is different " +
+            "than the expected.");
         }
 
         [Fact]
@@ -181,8 +176,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.Delete(1);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 
@@ -200,8 +194,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await devicesController.Delete(4);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var deviceReceived = values.As<Device>();
+            var deviceReceived = result.Value.As<Device>();
 
             dbContext.Dispose();
 

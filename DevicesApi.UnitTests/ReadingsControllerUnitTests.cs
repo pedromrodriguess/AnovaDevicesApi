@@ -3,10 +3,8 @@ using DevicesApi.Domain;
 using DevicesApi.TestsAuxiliaryTools;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,14 +27,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetAll();
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings));
+            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings), "Received readings list did " +
+                "not match with the expected");
         }
 
         [Fact]
@@ -53,14 +51,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId(1);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings));
+            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings), "Received readings list did " +
+                "not match with the expected");
         }
 
         [Fact]
@@ -73,8 +71,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId(5);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
@@ -95,14 +92,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId_Startingdate(1, 1001);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings));
+            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings), "Received readings list did " +
+                "not match with the expected");
         }
 
         [Fact]
@@ -115,8 +112,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId_Startingdate(5, 1001);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
@@ -137,14 +133,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId_Startingdate_Endingdate(1, 1001, 1002);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings));
+            Assert.True(ReadingsComparer.CompareReadingsLists(readingsReceived, expectedReadings), "Received readings list did " +
+                "not match with the expected");
         }
 
         [Fact]
@@ -157,8 +153,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId_Startingdate_Endingdate(5, 1001, 1002);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
@@ -176,8 +171,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.GetReadingsUsingDeviceId_Startingdate_Endingdate(1, 1002, 1000);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingsReceived = values.As<List<Reading>>();
+            var readingsReceived = result.Value.As<List<Reading>>();
 
             dbContext.Dispose();
 
@@ -196,14 +190,14 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.Create(expectedReading);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingReceived = values.As<Reading>();
+            var readingReceived = result.Value.As<Reading>();
 
             dbContext.Dispose();
 
             //Assert
             result.StatusCode.Should().Be((int)HttpStatusCode.Created);
-            Assert.True(ReadingsComparer.CompareReadings(readingReceived, expectedReading));
+            Assert.True(ReadingsComparer.CompareReadings(readingReceived, expectedReading), "Received reading did not " +
+                "match the expected.");
         }
 
         [Fact]
@@ -217,8 +211,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.Create(expectedReading);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingReceived = values.As<Reading>();
+            var readingReceived = result.Value.As<Reading>();
 
             dbContext.Dispose();
 
@@ -237,8 +230,7 @@ namespace DevicesApi.UnitTests
             //Act
             var response = await readingsController.Create(expectedReading);
             var result = (ObjectResult)response.Result;
-            var values = result.Value;
-            var readingReceived = values.As<Reading>();
+            var readingReceived = result.Value.As<Reading>();
 
             dbContext.Dispose();
 
