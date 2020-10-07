@@ -10,9 +10,6 @@ using System.Text;
 using DevicesApi.Contracts.Requests;
 using Newtonsoft.Json;
 using DevicesApi.TestsAuxiliaryTools;
-using System.Linq;
-using Microsoft.Data.SqlClient;
-using System.Data.SqlTypes;
 
 namespace DevicesApi.IntegrationTests
 {

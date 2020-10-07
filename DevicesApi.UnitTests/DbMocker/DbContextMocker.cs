@@ -1,9 +1,5 @@
 ﻿using DevicesApi.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore.InMemory;
 
 namespace DevicesApi.UnitTests
 {

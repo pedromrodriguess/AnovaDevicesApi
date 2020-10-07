@@ -1,10 +1,8 @@
 ﻿using DevicesApi.Contracts.Requests;
 using DevicesApi.Domain;
 using Microsoft.EntityFrameworkCore.Internal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace DevicesApi.TestsAuxiliaryTools
 {

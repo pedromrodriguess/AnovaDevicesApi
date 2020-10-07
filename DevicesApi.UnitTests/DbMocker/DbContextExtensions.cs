@@ -1,8 +1,5 @@
 ﻿using DevicesApi.Data;
 using DevicesApi.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DevicesApi.UnitTests
 {
