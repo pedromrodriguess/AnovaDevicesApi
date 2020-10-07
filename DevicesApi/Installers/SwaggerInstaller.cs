@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using System.Reflection;
@@ -12,7 +13,7 @@ namespace DevicesApi.Installers
         {
             services.AddSwaggerGen(x =>
             {
-                x.SwaggerDoc("v1", new Info { Title = "Tweetbook API", Version = "v1" });
+                x.SwaggerDoc("v1", new OpenApiInfo { Title = "Devices API", Version = "v1" });
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
