@@ -84,6 +84,8 @@ chmod +x "wait-for-it.sh"
 docker-compose -f docker-compose.tests.yml up --build
 ```
 
+The api and db containers will keep running after the tests are completed.
+
 
 
 
