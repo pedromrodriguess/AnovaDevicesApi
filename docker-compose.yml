@@ -22,6 +22,8 @@ services:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=Pedro*12345
             - MSSQL_TCP_PORT=1433
+        logging:
+            driver: none
         ports:
             - "1400:1433"
         networks:

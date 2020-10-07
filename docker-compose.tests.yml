@@ -11,8 +11,6 @@ services:
         depends_on:
             - db
             - api
-        links:
-             - api
         networks:
             - localdev
             
@@ -20,10 +18,11 @@ services:
         build: 
             context: ./
             dockerfile: ./DevicesApi.UnitTests/Dockerfile.tests.unit
+        networks:
+            - localdev
             
     api:
-        build: DevicesApi/
-        restart: always
+        build: DevicesApi/       
         ports:
             - "8000:80"
         depends_on:
@@ -38,6 +37,8 @@ services:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=Pedro*12345
             - MSSQL_TCP_PORT=1433
+        logging:
+            driver: none
         ports:
             - "1400:1433"
         networks:
